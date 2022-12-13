@@ -1,8 +1,6 @@
+import com.github.javafaker.Faker;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.By;
@@ -13,12 +11,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 
 public class PracaTest {
 
     WebDriver driver;
-    PracaPage page;
+    PracaStep page;
 
     public static String generateEncorrectPsw() {
 
@@ -30,15 +32,15 @@ public class PracaTest {
         return email;
     }
 
-    @Before
+    @BeforeMethod
     public void beforeMethod() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        page = new PracaPage(driver);
+        page = new PracaStep(driver);
         driver.get(page.URL);
     }
 
-    @After
+    @AfterMethod
     public void afterMethod() {
         driver.quit();
     }
@@ -49,7 +51,7 @@ public class PracaTest {
         final String FOOTER_COPY = "Режим работы сайта — круглосуточно. E-mail ООО «ПРАЦА БАЙ» editor@praca.by";
         By byXpath = By.xpath(xpathFooter);
         WebElement element = driver.findElement(byXpath);
-        Util.waiter(1);
+        Util.waiter(3);
         String actual = element.getText();
         Assert.assertEquals(FOOTER_COPY, actual);
     }
@@ -147,8 +149,11 @@ public class PracaTest {
 
     @Test
     public void testOpenPracaLoginPageIncorrect() {
-        String psw = generateEncorrectPsw();
-        String gmail = generateEncorrectEmail();
+        Faker faker = new Faker();
+        String psw=faker.internet().password();
+        String gmail=faker.internet().emailAddress();
+        //String psw = generateEncorrectPsw();
+        //String gmail = generateEncorrectEmail();
         String expectedIncorrectUserName = "Указан неверный e-mail или пароль";
         String xpathIncorrectUserName = "/html/body/div[1]/div[5]/div/div/div/div";
         page.fillFormAndClickSubmit(gmail, psw);
